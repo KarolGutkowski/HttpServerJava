@@ -1,6 +1,7 @@
-import java.io.IOException;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Scanner;
 
 public class Main {
   public static void main(String[] args) {
@@ -11,12 +12,19 @@ public class Main {
 
 
      try {
-       ServerSocket serverSocket = new ServerSocket(4221);
-       serverSocket.setReuseAddress(true);
-       Socket clientSocket = serverSocket.accept(); // Wait for connection from client.
-       System.out.println("accepted new connection");
+         ServerSocket server = new ServerSocket(4221);
+         server.setReuseAddress(true); // important so you can restart on the same port without problems
+
+         Socket client = server.accept();
+
+         var clientWriter = new PrintWriter(client.getOutputStream());
+         var response = new HttpResponse("1.1", 200, "OK");
+         clientWriter.println(response.toString());
+
+         clientWriter.close();
+         client.close();
      } catch (IOException e) {
-       System.out.println("IOException: " + e.getMessage());
+         System.err.printf("Server failed while running %s \n", e.getMessage());
      }
   }
 }
