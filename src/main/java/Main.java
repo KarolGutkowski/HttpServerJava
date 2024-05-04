@@ -31,7 +31,7 @@ public class Main {
                  response = new HttpResponse("1.1", 200, "OK");
              } else if (request_parser.isRequestValid() && request_uri.startsWith("/echo/")){
                  var response_body = request_uri.substring("/echo/".length());
-                 response = new HttpResponse("1.1", 200, "OK", response_body);
+                 response = new HttpResponse("1.1", 200, "OK", response_body, "text/plain");
              }  else if (request_parser.isRequestValid()){
                  response = new HttpResponse("1.1", 404, "Not Found");
              } else {
