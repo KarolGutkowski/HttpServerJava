@@ -29,12 +29,16 @@ public class Main {
 
              if (request_parser.isRequestValid() && request_uri.equals("/")) {
                  response = new HttpResponse("1.1", 200, "OK");
-             } else if (request_parser.isRequestValid()){
+             } else if (request_parser.isRequestValid() && request_uri.startsWith("/echo/")){
+                 var response_body = request_uri.substring("/echo/".length());
+                 response = new HttpResponse("1.1", 200, "OK", response_body);
+             }  else if (request_parser.isRequestValid()){
                  response = new HttpResponse("1.1", 404, "Not Found");
              } else {
                  response = new HttpResponse("1.1", 400, "Bad Request");
              }
-             clientWriter.println(response);
+
+             clientWriter.print(response);
 
              clientWriter.close();
              client.close();

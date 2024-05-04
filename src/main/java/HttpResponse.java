@@ -23,25 +23,30 @@ public class HttpResponse
         this.headers = Optional.empty();
     }
 
+    public HttpResponse(String _http_version,
+                        int _status_code,
+                        String _reason_phrase,
+                        String _response_body) {
+        this(_http_version, _status_code, _reason_phrase);
+        this.body_message = Optional.of(_response_body);
+    }
 
     @Override
     public String toString() {
-        var line_separator = "\r\n";
         var response_message = new StringBuilder();
         response_message.append("HTTP/").append(http_version).append(" ");
         response_message.append(status_code).append(" ").append(reason_phrase);
-        response_message.append(line_separator);
+        response_message.append(WebConstants.CRLF);
         if(headers.isPresent()) {
             for (var header: headers.get()) {
                 response_message.append(header);
             }
         }
-        response_message.append(line_separator);
+        response_message.append(WebConstants.CRLF);
 
-        if(body_message.isPresent()) {
-            response_message.append(body_message);
-        }
-        response_message.append(line_separator);
+        body_message.ifPresent(response_message::append);
+
+        response_message.append(WebConstants.CRLF);
         return response_message.toString();
     }
 }
