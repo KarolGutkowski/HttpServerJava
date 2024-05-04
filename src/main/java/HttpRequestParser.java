@@ -20,33 +20,81 @@
 //                      | extension-method
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class HttpRequestParser {
     private static List<String> accepted_methods = Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "TRACE", "CONNECT");
     private Boolean valid_request;
-    private String request_line;
     private RequestLine request;
+    private List<String> request_headers_list;
+    private RequestHeaders requestHeaders;
+    private RequestBody request_body;
+    private Boolean has_body = false;
+    private Integer body_length;
 
     public HttpRequestParser(InputStream request_stream) {
         valid_request = true;
         var requestReader = new BufferedReader(new InputStreamReader(request_stream));
         parseRequestLine(requestReader);
+        parseRequestHeaders(requestReader);
+        parseRequestBody();
+
+        requestHeaders = new RequestHeaders(request_headers_list);
+    }
+
+    private void parseRequestBody() {
+        if(has_body) {
+            var bodyStringBuilder = new StringBuilder();
+            var removed_length = 0;
+            while (removed_length < body_length) {
+                var removed = request_headers_list.remove(request_headers_list.size() -1);
+                removed_length += removed_length;
+
+                bodyStringBuilder.append(removed);
+            }
+
+            request_body = new RequestBody(bodyStringBuilder.toString());
+        }
+    }
+
+    // for now handle simple case of just reading line by line and assuming body doesn't span many lines
+    private void parseRequestHeaders(BufferedReader requestReader) {
+        try {
+            request_headers_list = new ArrayList<>();
+            String current_line;
+            while (!(current_line = requestReader.readLine()).isEmpty()) {
+                request_headers_list.add(current_line);
+                determine_if_indicates_content(current_line);
+            }
+        }catch (IOException exception) {
+            invalidateRequest();
+        }
+    }
+
+    private void determine_if_indicates_content(String line) {
+        var content_length_string = "Content-Length";
+        if(line.startsWith("Content-Length")) {
+            has_body = true;
+
+            var contentLengthValueString = line.substring(content_length_string.length());
+            body_length = Integer.getInteger(contentLengthValueString);
+        }
     }
 
     private void parseRequestLine(BufferedReader requestReader) {
         try {
-            request_line = requestReader.readLine();
-            var first_space_postion = request_line.indexOf(WebConstants.SP);
+            String request_line = requestReader.readLine();
+            var first_space_position = request_line.indexOf(WebConstants.SP);
 
-            var request_method = request_line.substring(0, first_space_postion);
+            var request_method = request_line.substring(0, first_space_position);
             if (!accepted_methods.contains(request_method)) {
                 invalidateRequest();
                 return;
             }
 
-            var rest_of_request = request_line.substring(first_space_postion + 1);
+            var rest_of_request = request_line.substring(first_space_position + 1);
             var second_space_position = rest_of_request.indexOf(WebConstants.SP);
             var request_uri = rest_of_request.substring(0, second_space_position);
             var request_http_version = rest_of_request.substring(second_space_position + 1);
@@ -64,6 +112,18 @@ public class HttpRequestParser {
 
     public String getRequestUri() {
         return request.uri();
+    }
+
+    public RequestBody getRequest_body() {
+        return request_body;
+    }
+
+    public RequestHeaders getRequestHeaders() {
+        return requestHeaders;
+    }
+
+    public RequestLine getRequestLine() {
+        return request;
     }
 
     private void invalidateRequest() {

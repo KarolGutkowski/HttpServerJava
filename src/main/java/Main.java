@@ -12,8 +12,6 @@ public class Main {
     System.out.println("Logs from your program will appear here!");
 
      //Uncomment this block to pass the first stage
-
-
      try {
          ServerSocket server = new ServerSocket(4221);
          server.setReuseAddress(true); // important so you can restart on the same port without problems
@@ -24,19 +22,11 @@ public class Main {
              var clientWriter = new PrintWriter(client.getOutputStream());
              var request_parser = new HttpRequestParser(client.getInputStream());
 
-             var request_uri = request_parser.getRequestUri();
-             HttpResponse response;
+             var handler = new RequestHandler(request_parser.getRequestLine(),
+                     request_parser.getRequestHeaders(),
+                     request_parser.getRequest_body());
 
-             if (request_parser.isRequestValid() && request_uri.equals("/")) {
-                 response = new HttpResponse("1.1", 200, "OK");
-             } else if (request_parser.isRequestValid() && request_uri.startsWith("/echo/")){
-                 var response_body = request_uri.substring("/echo/".length());
-                 response = new HttpResponse("1.1", 200, "OK", response_body, "text/plain");
-             }  else if (request_parser.isRequestValid()){
-                 response = new HttpResponse("1.1", 404, "Not Found");
-             } else {
-                 response = new HttpResponse("1.1", 400, "Bad Request");
-             }
+             var response = handler.produceResponse(request_parser.isRequestValid());
 
              clientWriter.print(response);
 
