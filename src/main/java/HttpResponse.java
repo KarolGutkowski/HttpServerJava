@@ -1,10 +1,7 @@
 import jdk.jfr.Unsigned;
 
 import javax.swing.text.html.Option;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class HttpResponse
 {
@@ -32,9 +29,19 @@ public class HttpResponse
                         String content_type_header) {
         this(_http_version, _status_code, _reason_phrase);
 
-        var content_type_header_whole = "Content-Type: " + content_type_header + WebConstants.CRLF;
+        var content_type_header_whole = "Content-Type: " +
+                content_type_header +
+                WebConstants.CRLF;
 
-        this.headers = Optional.of(Collections.singletonList(content_type_header_whole));
+        var content_length_header = "Content-Length: " +
+                _response_body.length() +
+                WebConstants.CRLF;
+
+        List<String> headers_list = new ArrayList<>();
+        headers_list.add(content_type_header_whole);
+        headers_list.add(content_length_header);
+
+        this.headers = Optional.of(headers_list);
         this.body_message = Optional.of(_response_body);
     }
 
