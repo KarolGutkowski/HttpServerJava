@@ -10,7 +10,7 @@ public class RequestHeaders {
             var separator = ':';
             var separator_position = header.indexOf(separator);
             var field_name = header.substring(0, separator_position);
-            var field_value = header.substring(separator_position+1);
+            var field_value = header.substring(separator_position+1).trim();
             this.headers.put(field_name, field_value);
         }
     }
