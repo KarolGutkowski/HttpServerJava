@@ -38,8 +38,18 @@ public class HttpRequestParser {
         valid_request = true;
         var requestReader = new BufferedReader(new InputStreamReader(request_stream));
         parseRequestLine(requestReader);
+
+        if(!valid_request)
+            return;
+
         parseRequestHeaders(requestReader);
+        if(!valid_request)
+            return;
+
         parseRequestBody();
+
+        if(!valid_request)
+            return;
 
         requestHeaders = new RequestHeaders(request_headers_list);
     }
@@ -86,7 +96,17 @@ public class HttpRequestParser {
     private void parseRequestLine(BufferedReader requestReader) {
         try {
             String request_line = requestReader.readLine();
+
+            if(request_line == null || request_line.isEmpty()) {
+                invalidateRequest();
+                return;
+            }
+
             var first_space_position = request_line.indexOf(WebConstants.SP);
+            if(first_space_position == -1) {
+                invalidateRequest();
+                return;
+            }
 
             var request_method = request_line.substring(0, first_space_position);
             if (!accepted_methods.contains(request_method)) {

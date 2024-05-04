@@ -17,21 +17,7 @@ public class Main {
          server.setReuseAddress(true); // important so you can restart on the same port without problems
 
          while (true) {
-             Socket client = server.accept();
-
-             var clientWriter = new PrintWriter(client.getOutputStream());
-             var request_parser = new HttpRequestParser(client.getInputStream());
-
-             var handler = new RequestHandler(request_parser.getRequestLine(),
-                     request_parser.getRequestHeaders(),
-                     request_parser.getRequest_body());
-
-             var response = handler.produceResponse(request_parser.isRequestValid());
-
-             clientWriter.print(response);
-
-             clientWriter.close();
-             client.close();
+             new ClientHandler(server.accept()).start();
          }
 
      } catch (IOException e) {
