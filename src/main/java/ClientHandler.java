@@ -24,7 +24,7 @@ public class ClientHandler extends Thread {
 
             clientWriter.close();
             client.close();
-        }catch (IOException exception) {
+        }catch (Exception exception) {
             System.err.println("Error while processing client request");
         }
     }
