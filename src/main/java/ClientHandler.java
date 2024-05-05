@@ -4,9 +4,11 @@ import java.net.Socket;
 
 public class ClientHandler extends Thread {
     private Socket client;
+    private String directory;
 
-    public ClientHandler(Socket socket) {
+    public ClientHandler(Socket socket, String _directory) {
         client = socket;
+        directory = _directory;
     }
 
     @Override public void run() {
@@ -16,7 +18,8 @@ public class ClientHandler extends Thread {
 
             var handler = new RequestHandler(request_parser.getRequestLine(),
                     request_parser.getRequestHeaders(),
-                    request_parser.getRequest_body());
+                    request_parser.getRequest_body(),
+                    directory);
 
             var response = handler.produceResponse(request_parser.isRequestValid());
 
