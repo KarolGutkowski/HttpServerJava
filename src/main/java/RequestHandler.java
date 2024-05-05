@@ -48,8 +48,7 @@ public class RequestHandler {
                             200,
                             "OK",
                             Arrays.toString(file_bytes),
-                           "application/octet-stream",
-                            "test");
+                           "application/octet-stream");
                 }catch (IOException exception) {
                     response = new HttpResponse("1.1", 500, "Internal Error");
                     System.err.println("Error while attempting to read bytes of a file: " + exception.getMessage());
