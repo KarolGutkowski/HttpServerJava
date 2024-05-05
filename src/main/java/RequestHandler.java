@@ -1,5 +1,7 @@
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
@@ -54,6 +56,18 @@ public class RequestHandler {
                     }
                 }
             }
+        } else if(requestLine.uri().startsWith("/files") && requestLine.httpMethod().equals("POST")) {
+            var filename = requestLine.uri().substring("/files/".length());
+            var body = requestBody.value();
+
+            try {
+                var writer = new PrintWriter(directory+filename, "UTF-8");
+                writer.print(body);
+                writer.close();
+
+                response = new HttpResponse("1.1", 201, "Created");
+            }catch (Exception ignore) {}
+
         }
 
         return response;

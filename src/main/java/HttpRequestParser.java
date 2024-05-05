@@ -46,23 +46,28 @@ public class HttpRequestParser {
         if(!valid_request)
             return;
 
-        parseRequestBody();
-
+        parseRequestBody(requestReader);
         if(!valid_request)
             return;
 
         requestHeaders = new RequestHeaders(request_headers_list);
     }
 
-    private void parseRequestBody() {
+    private void parseRequestBody(BufferedReader requestReader) {
         if(has_body) {
             var bodyStringBuilder = new StringBuilder();
-            var removed_length = 0;
-            while (removed_length < body_length) {
-                var removed = request_headers_list.remove(request_headers_list.size() -1);
-                removed_length += removed_length;
+            var read_length = body_length;
+            while (read_length > 0) {
+                try {
+                    char[] buf = new char[read_length];
+                    var actually_read = requestReader.read(buf,0 , read_length);
+                    read_length -= actually_read;
 
-                bodyStringBuilder.append(removed);
+                    bodyStringBuilder.append(buf);
+                }catch (IOException ioException) {
+                    invalidateRequest();
+                    return;
+                }
             }
 
             request_body = new RequestBody(bodyStringBuilder.toString());
@@ -88,8 +93,9 @@ public class HttpRequestParser {
         if(line.startsWith("Content-Length")) {
             has_body = true;
 
-            var contentLengthValueString = line.substring(content_length_string.length());
-            body_length = Integer.getInteger(contentLengthValueString);
+            var contentLengthValueString = line.substring(content_length_string.length()+1);
+            body_length = Integer.valueOf(contentLengthValueString.trim());
+            System.out.println("body length is " + body_length);
         }
     }
 

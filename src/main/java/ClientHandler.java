@@ -28,6 +28,11 @@ public class ClientHandler extends Thread {
             clientWriter.close();
             client.close();
         }catch (Exception exception) {
+
+            try {
+                client.close();
+            }catch (IOException ignored) {}
+
             System.err.println("Error while processing client request");
         }
     }
