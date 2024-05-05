@@ -40,18 +40,18 @@ public class RequestHandler {
             var filename = requestLine.uri().substring("/files/".length());
             if(!filename.isEmpty()) {
                 var file = directory.isEmpty() ? new File(filename): new File(directory, filename);
-                if(file.exists())
-                    System.out.println("file exists");
-                try {
-                    var file_bytes = Files.readAllBytes(file.toPath());
-                    response = new HttpResponse("1.1",
-                            200,
-                            "OK",
-                            Arrays.toString(file_bytes),
-                           "application/octet-stream");
-                }catch (IOException exception) {
-                    response = new HttpResponse("1.1", 500, "Internal Error");
-                    System.err.println("Error while attempting to read bytes of a file: " + exception.getMessage());
+                if(file.exists()) {
+                    try {
+                        var file_contents = Files.readString(file.toPath());
+                        response = new HttpResponse("1.1",
+                                200,
+                                "OK",
+                                file_contents,
+                                "application/octet-stream");
+                    } catch (IOException exception) {
+                        response = new HttpResponse("1.1", 500, "Internal Error");
+                        System.err.println("Error while attempting to read bytes of a file: " + exception.getMessage());
+                    }
                 }
             }
         }
