@@ -1,39 +1,17 @@
-[![progress-banner](https://backend.codecrafters.io/progress/http-server/d0894055-81e1-4a4a-9319-9797e4920f8b)](https://app.codecrafters.io/users/codecrafters-bot?r=2qF)
+## Basic http server build on sockets in Java
 
-This is a starting point for Java solutions to the
-["Build Your Own HTTP server" Challenge](https://app.codecrafters.io/courses/http-server/overview).
+The server is capable parsing HTTP requests and responding with accordance to the HTTP 1.1 standard
 
-[HTTP](https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol) is the
-protocol that powers the web. In this challenge, you'll build a HTTP/1.1 server
-that is capable of serving multiple clients.
+Example endpoints include 
 
-Along the way you'll learn about TCP servers,
-[HTTP request syntax](https://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html),
-and more.
+```GET /echo/[text] ```
+which returns the text
 
-**Note**: If you're viewing this repo on GitHub, head over to
-[codecrafters.io](https://codecrafters.io) to try the challenge.
+```GET /user-agent ``` responds with header value of user agent
 
-# Passing the first stage
+```GET /files/[filename] ``` send a file from server (if it exists) as byte stream (tested with a web browser, curl and postman)
 
-The entry point for your HTTP server implementation is in
-`src/main/java/Main.java`. Study and uncomment the relevant code, and push your
-changes to pass the first stage:
+```POST /files/[filename] ``` send file to a server and save it there
 
-```sh
-git add .
-git commit -m "pass 1st stage" # any msg
-git push origin master
-```
 
-Time to move on to the next stage!
-
-# Stage 2 & beyond
-
-Note: This section is for stages 2 and beyond.
-
-1. Ensure you have `java (21)` installed locally
-1. Run `./your_server.sh` to run your program, which is implemented in
-   `src/main/java/Main.java`.
-1. Commit your changes and run `git push origin master` to submit your solution
-   to CodeCrafters. Test output will be streamed to your terminal.
+I'm planning on expanding this project with some more elegant ways of handling the endpoints and adding support for more types of requests. This project mainly serves as a learning opportunity about http standard.
